@@ -1,0 +1,319 @@
+
+\echo Use "CREATE EXTENSION vpack" to load this file. \quit
+
+CREATE OR REPLACE FUNCTION vpack_in(cstring) RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_out(vpack) RETURNS cstring AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OR REPLACE FUNCTION vpack_mirror(internal) RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_mirror(vpack) RETURNS bytea AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+
+CREATE TYPE vpack (
+	INPUT = vpack_in,
+	OUTPUT = vpack_out,
+	RECEIVE = vpack_mirror,
+	SEND = vpack_mirror,
+	INTERNALLENGTH = VARIABLE,
+	CATEGORY = 'C',
+	ALIGNMENT = int4,
+	STORAGE = extended
+);
+
+
+CREATE OR REPLACE FUNCTION vpackpath_in(cstring) RETURNS vpackpath AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpackpath_out(vpackpath) RETURNS cstring AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OR REPLACE FUNCTION vpackpath_recv(internal) RETURNS vpackpath AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpackpath_send(vpackpath) RETURNS bytea AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+
+CREATE TYPE vpackpath (
+	INPUT = vpackpath_in,
+	OUTPUT = vpackpath_out,
+	RECEIVE = vpackpath_recv,
+	SEND = vpackpath_send,
+	INTERNALLENGTH = VARIABLE,
+	CATEGORY = 'C',
+	ALIGNMENT = int4,
+	STORAGE = extended
+);
+
+
+CREATE OR REPLACE FUNCTION vpack_hash(vpack) RETURNS integer AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_mirror(bytea) RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OR REPLACE FUNCTION to_vpack(anyelement) RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OR REPLACE FUNCTION vpack_cast_text(vpack) RETURNS text AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION text_cast_vpack(text) RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OR REPLACE FUNCTION vpack_cast_json(vpack) RETURNS json AS 'MODULE_PATHNAME', 'vpack_cast_text' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION json_cast_vpack(json) RETURNS vpack AS 'MODULE_PATHNAME', 'text_cast_vpack' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OR REPLACE FUNCTION jsonb_cast_vpack(jsonb) RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OR REPLACE FUNCTION bson_to_vpack(bytea) RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OR REPLACE FUNCTION vpack_concat(vpack, vpack) RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_concat_any(vpack, anyelement) RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_array_field(vpack, integer) RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_array_field_string(vpack, integer) RETURNS text AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_object_field(vpack, text) RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_object_field_string(vpack, text) RETURNS text AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OR REPLACE FUNCTION vpack_eq(vpack, vpack) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_ne(vpack, vpack) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OR REPLACE FUNCTION vpack_cmp(vpack, vpack) RETURNS integer AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_ge(vpack, vpack) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_gt(vpack, vpack) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_le(vpack, vpack) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_lt(vpack, vpack) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_lt_integer(vpack, integer) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OR REPLACE FUNCTION vpack_contains(vpack, vpack) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_contained(vpack, vpack) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_extract_path(vpack, text[]) RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_extract_path_text(vpack, text[]) RETURNS text AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OR REPLACE FUNCTION vpack_exists(vpack, text) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_exists_any(vpack, text[]) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_exists_all(vpack, text[]) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OR REPLACE FUNCTION vpack_set(vpack, text[], anyelement) RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OR REPLACE FUNCTION vpack_build_object(VARIADIC "any") RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_build_array(VARIADIC "any") RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE PARALLEL SAFE COST 1;
+
+
+CREATE OR REPLACE FUNCTION gin_compare_vpack(text, text) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION gin_extract_vpack(internal, internal, internal) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION gin_extract_vpack_query(anyarray, internal, smallint, internal, internal, internal, internal) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION gin_consistent_vpack(internal, smallint, anyarray, integer, internal, internal, internal, internal) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OR REPLACE FUNCTION gin_extract_vpack_path(internal, internal, internal) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION gin_extract_vpack_query_path(anyarray, internal, smallint, internal, internal, internal, internal) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION gin_consistent_vpack_path(internal, smallint, anyarray, integer, internal, internal, internal, internal) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+
+CREATE CAST (vpack as bytea) WITH FUNCTION vpack_mirror(vpack) AS IMPLICIT;
+CREATE CAST (bytea as vpack) WITH FUNCTION vpack_mirror(bytea);
+
+CREATE CAST (vpack as text)  WITH FUNCTION vpack_cast_text(vpack);
+CREATE CAST (text  as vpack) WITH FUNCTION text_cast_vpack(text);
+
+CREATE CAST (vpack as json)  WITH FUNCTION vpack_cast_json(vpack);
+CREATE CAST (json  as vpack) WITH FUNCTION json_cast_vpack(json);
+
+CREATE CAST (jsonb as vpack) WITH FUNCTION jsonb_cast_vpack(jsonb);
+-- CREATE CAST (vpack as jsonb) WITH FUNCTION vpack_cast_jsonb(jsonb);
+
+
+CREATE OPERATOR = (
+	PROCEDURE = vpack_eq,
+	LEFTARG = vpack,
+	RIGHTARG = vpack,
+	COMMUTATOR = =,
+	NEGATOR = <>,
+	MERGES,
+	HASHES
+);
+
+CREATE OPERATOR <> (
+	PROCEDURE = vpack_ne,
+	LEFTARG = vpack,
+	RIGHTARG = vpack,
+	COMMUTATOR = <>,
+	NEGATOR = =
+);
+
+CREATE OPERATOR < (
+	PROCEDURE = vpack_lt,
+	LEFTARG = vpack,
+	RIGHTARG = vpack,
+	COMMUTATOR = >,
+	NEGATOR = >=
+);
+
+CREATE OPERATOR <= (
+	PROCEDURE = vpack_le,
+	LEFTARG = vpack,
+	RIGHTARG = vpack,
+	COMMUTATOR = >=,
+	NEGATOR = >
+);
+
+CREATE OPERATOR > (
+	PROCEDURE = vpack_gt,
+	LEFTARG = vpack,
+	RIGHTARG = vpack,
+	COMMUTATOR = <,
+	NEGATOR = <=
+);
+
+CREATE OPERATOR >= (
+	PROCEDURE = vpack_ge,
+	LEFTARG = vpack,
+	RIGHTARG = vpack,
+	COMMUTATOR = <=,
+	NEGATOR = <
+);
+
+CREATE OPERATOR || (
+	PROCEDURE = vpack_concat,
+	LEFTARG = vpack,
+	RIGHTARG = vpack
+);
+
+CREATE OPERATOR || (
+	PROCEDURE = vpack_concat_any,
+	LEFTARG = vpack,
+	RIGHTARG = anyelement
+);
+
+CREATE OPERATOR -> (
+	PROCEDURE = vpack_object_field,
+	LEFTARG = vpack,
+	RIGHTARG = text
+);
+
+CREATE OPERATOR -> (
+	PROCEDURE = vpack_array_field,
+	LEFTARG = vpack,
+	RIGHTARG = integer
+);
+
+CREATE OPERATOR ->> (
+	PROCEDURE = vpack_object_field_string,
+	LEFTARG = vpack,
+	RIGHTARG = text
+);
+
+CREATE OPERATOR ->> (
+	PROCEDURE = vpack_array_field_string,
+	LEFTARG = vpack,
+	RIGHTARG = integer
+);
+
+CREATE OPERATOR @> (
+	PROCEDURE = vpack_contains,
+	LEFTARG = vpack,
+	RIGHTARG = vpack,
+	NEGATOR = <@
+);
+
+CREATE OPERATOR <@ (
+	PROCEDURE = vpack_contained,
+	LEFTARG = vpack,
+	RIGHTARG = vpack,
+	NEGATOR = @>
+);
+
+CREATE OPERATOR ? (
+	PROCEDURE = vpack_exists,
+	LEFTARG = vpack,
+	RIGHTARG = text
+);
+
+CREATE OPERATOR ?& (
+	PROCEDURE = vpack_exists_all,
+	LEFTARG = vpack,
+	RIGHTARG = text[]
+);
+
+CREATE OPERATOR ?| (
+	PROCEDURE = vpack_exists_any,
+	LEFTARG = vpack,
+	RIGHTARG = text[]
+);
+
+CREATE OPERATOR #> (
+	PROCEDURE = vpack_extract_path,
+	LEFTARG = vpack,
+	RIGHTARG = text[]
+);
+
+CREATE OPERATOR #>> (
+	PROCEDURE = vpack_extract_path_text,
+	LEFTARG = vpack,
+	RIGHTARG = text[]
+);
+
+
+CREATE OR REPLACE FUNCTION vpack_object_field_integer(vpack, text) RETURNS integer AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_extract_path_integer(vpack, text[]) RETURNS integer AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OPERATOR ->>> (
+	PROCEDURE = vpack_object_field_integer,
+	LEFTARG = vpack,
+	RIGHTARG = text
+);
+
+CREATE OPERATOR #>>> (
+	PROCEDURE = vpack_extract_path_integer,
+	LEFTARG = vpack,
+	RIGHTARG = text[]
+);
+
+/* VPackPath */
+
+CREATE OR REPLACE FUNCTION vpack_path_exists(vpack, vpackpath, vars vpack DEFAULT '{}', silent bool DEFAULT FALSE) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_path_exists_opr(vpack, vpackpath) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_path_query(vpack, vpackpath, vars vpack DEFAULT '{}', silent bool DEFAULT FALSE) RETURNS SETOF vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_path_query_array(vpack, vpackpath, vars vpack DEFAULT '{}', silent bool DEFAULT FALSE) RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_path_query_first(vpack, vpackpath, vars vpack DEFAULT '{}', silent bool DEFAULT FALSE) RETURNS vpack AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_path_match(vpack, vpackpath, vars vpack DEFAULT '{}', silent bool DEFAULT FALSE) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE PARALLEL SAFE COST 1;
+CREATE OR REPLACE FUNCTION vpack_path_match_opr(vpack, vpackpath) RETURNS bool AS 'MODULE_PATHNAME' LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE COST 1;
+
+CREATE OPERATOR @? (
+	PROCEDURE = vpack_path_exists_opr,
+	LEFTARG = vpack,
+	RIGHTARG = vpackpath
+);
+
+CREATE OPERATOR @@ (
+	PROCEDURE = vpack_path_match_opr,
+	LEFTARG = vpack,
+	RIGHTARG = vpackpath
+);
+
+
+CREATE OPERATOR CLASS vpack_ops DEFAULT
+	FOR TYPE vpack USING hash AS
+	OPERATOR 1  =,
+	FUNCTION 1  vpack_hash(vpack);
+
+CREATE OPERATOR CLASS vpack_ops DEFAULT
+	FOR TYPE vpack USING btree AS
+	OPERATOR 1  <,
+	OPERATOR 2  <=,
+	OPERATOR 3  =,
+	OPERATOR 4  >=,
+	OPERATOR 5  >,
+	FUNCTION 1  vpack_cmp(vpack, vpack);
+
+CREATE OPERATOR CLASS vpack_ops DEFAULT
+	FOR TYPE vpack USING gin AS
+	OPERATOR 7  @>,
+	OPERATOR 9  ?(vpack, text),
+	OPERATOR 10 ?|(vpack, _text),
+	OPERATOR 11 ?&(vpack, _text),
+	OPERATOR 15 @?(vpack, vpackpath),
+	OPERATOR 16 @@(vpack, vpackpath),
+	FUNCTION 1  gin_compare_vpack(text, text),
+	FUNCTION 2  gin_extract_vpack(internal, internal, internal),
+	FUNCTION 3  gin_extract_vpack_query(anyarray, internal, smallint, internal, internal, internal, internal),
+	FUNCTION 4  gin_consistent_vpack(internal, smallint, anyarray, integer, internal, internal, internal, internal),
+	STORAGE text;
+
+CREATE OPERATOR CLASS vpack_path_ops
+	FOR TYPE vpack USING gin AS
+	OPERATOR 7  @>,
+	OPERATOR 15 @?(vpack, vpackpath),
+	OPERATOR 16 @@(vpack, vpackpath),
+	FUNCTION 1  btint4cmp(integer, integer),
+	FUNCTION 2  gin_extract_vpack_path(internal, internal, internal),
+	FUNCTION 3  gin_extract_vpack_query_path(anyarray, internal, smallint, internal, internal, internal, internal),
+	FUNCTION 4  gin_consistent_vpack_path(internal, smallint, anyarray, integer, internal, internal, internal, internal),
+	STORAGE int4;
+
